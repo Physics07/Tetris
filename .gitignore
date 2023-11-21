@@ -1,0 +1,5 @@
+# VSC Settings
+/.vscode
+
+#ignore exe files
+*.exe
