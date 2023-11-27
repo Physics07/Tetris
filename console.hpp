@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <turboc.h>
 #include <windows.h>
 #include <conio.h>
 
@@ -23,13 +24,14 @@ struct InputKey {
     }
 
     // set key with user input
-    void input() {
+    InputKey input() {
         key = getch();
         if(key == KEY_ARROW) {
             isSpecial = true;
             key = getch();
         }
         else isSpecial = false;
+        return *this;
     }
 
     // compare two keys
@@ -37,6 +39,7 @@ struct InputKey {
         if(key == key_comp.key && isSpecial == key_comp.isSpecial) return true;
         return false;
     }
+    // compare with char: only if the key is a character
     bool operator==(const char &key_char) const {
         if(isSpecial) return false;
         return key == key_char;
@@ -54,4 +57,16 @@ const InputKey LEFT = InputKey(KEY_LEFT, true);
 */
 void console_full_screen() {
     SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE), CONSOLE_WINDOWED_MODE, 0);
+}
+
+/**
+ * @brief draws a character or a string on the (X, Y) position
+*/
+void draw_char(char c, int X, int Y) {
+    gotoXY(X, Y);
+    printf("%c", c);
+}
+void draw_string(string s, int X, int Y) {
+    gotoXY(X, Y);
+    printf("%s", s.c_str());
 }
