@@ -11,23 +11,6 @@ int main() {
     setCursorType(NOCURSOR);
 
     /// for debugings
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_int_distribution<int> dist(0, 6);
-    TetrisBoard board;
-    Block *block = new Block(dist(mt), &board);
-    block->make_in_board();
-    while(true) {
-        board.show();
-        if(Z.is_pressing()) block->rotate_counterclockwise();
-        if(X.is_pressing()) block->rotate_clockwise();
-        if(SPACE.is_pressing()) {
-            block->hard_drop();
-            block = new Block(dist(mt), &board);
-            block->make_in_board();
-        }
-        if(DOWN.is_pressing()) block->move_block_down();
-        if(LEFT.is_pressing()) block->move_block_left();
-        if(RIGHT.is_pressing()) block->move_block_right();
-    }
+    Game game(get_key_value('z'), get_key_value('x'), VK_SPACE, VK_LEFT, VK_RIGHT, VK_DOWN);
+    while(game.in_game_loop());
 }

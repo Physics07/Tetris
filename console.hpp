@@ -12,17 +12,39 @@ using namespace std;
 */
 struct InputKey {
     int key;
-    InputKey(int _key): key(_key) {}
+    bool is_pressed;
+    InputKey(int _key): key(_key), is_pressed(0) {}
     InputKey() {
         key = 0;
+        is_pressed = false;
     }
 
     /**
      * @brief returns whether the key is pressed
     */
     bool is_pressing() {
-        if(GetAsyncKeyState(key)) return true;
-        else return false;
+        if(GetAsyncKeyState(key) & 0x8000) {
+            is_pressed = true;
+            return true;
+        }
+        is_pressed = false;
+        return false;
+    }
+
+    /**
+     * @brief returns whether the key is pressed for the first
+    */
+    bool is_pressed_first() {
+        short x = GetAsyncKeyState(key);
+        if(is_pressed) {
+            if(x == 0x0000 || x == 0x0001) is_pressed = false;
+            return false;
+        }
+        if(x & 0x8000) {
+            is_pressed = true;
+            return true;
+        }
+        return false;
     }
 };
 
@@ -48,4 +70,11 @@ void draw_char(char c, int X, int Y) {
 void draw_string(string s, int X, int Y) {
     gotoXY(X, Y);
     printf("%s", s.c_str());
+}
+
+/**
+ * @brief gets the millisecond time from clock
+*/
+double clock_millisecond(clock_t ticks){
+    return (ticks/(double)CLOCKS_PER_SEC)*1000.0;
 }
