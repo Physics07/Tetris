@@ -3,11 +3,7 @@
 #include <windows.h>
 #include <conio.h>
 
-#define KEY_ARROW 224
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
+#define VK_CHAR_A 0x41
 
 using namespace std;
 
@@ -16,40 +12,23 @@ using namespace std;
 */
 struct InputKey {
     int key;
-    bool isSpecial;
-    InputKey(int _key, bool _isSpecial): key(_key), isSpecial(_isSpecial) {}
+    InputKey(int _key): key(_key) {}
     InputKey() {
         key = 0;
-        isSpecial = 0;
     }
 
-    // set key with user input
-    InputKey input() {
-        key = getch();
-        if(key == KEY_ARROW) {
-            isSpecial = true;
-            key = getch();
-        }
-        else isSpecial = false;
-        return *this;
-    }
-
-    // compare two keys
-    bool operator==(const InputKey &key_comp) const {
-        if(key == key_comp.key && isSpecial == key_comp.isSpecial) return true;
-        return false;
-    }
-    // compare with char: only if the key is a character
-    bool operator==(const char &key_char) const {
-        if(isSpecial) return false;
-        return key == key_char;
+    /**
+     * @brief returns whether the key is pressed
+    */
+    bool is_pressing() {
+        if(GetAsyncKeyState(key)) return true;
+        else return false;
     }
 };
-// constant keys for global using
-const InputKey UP = InputKey(KEY_UP, true);
-const InputKey DOWN = InputKey(KEY_DOWN, true);
-const InputKey RIGHT = InputKey(KEY_RIGHT, true);
-const InputKey LEFT = InputKey(KEY_LEFT, true);
+
+int get_key_value(char c) {
+    return VK_CHAR_A + c - 'a';
+}
 
 /**
  * @brief set the command prompt to full screen mode
