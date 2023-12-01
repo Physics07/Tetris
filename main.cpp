@@ -9,8 +9,15 @@ InputKey SPACE(VK_SPACE), UP(VK_UP), DOWN(VK_DOWN), LEFT(VK_LEFT), RIGHT(VK_RIGH
 
 int main() {
     setCursorType(NOCURSOR);
+    system("chcp 65001");
+    system("cls");
+    COLORMAKER.set_color_white();
 
     /// for debugings
-    Game game(get_key_value('z'), get_key_value('x'), VK_SPACE, VK_LEFT, VK_RIGHT, VK_DOWN);
-    while(game.in_game_loop());
+    Game player1(get_key_value('q'), get_key_value('w'), get_key_value('f'), get_key_value('c'), get_key_value('b'), get_key_value('v'), 30, 5);
+    Game player2(get_key_value('l'), VK_OEM_1, VK_RSHIFT, VK_LEFT, VK_RIGHT, VK_DOWN, 100, 5); /// VK_OEM_1: ';' key
+    player1.set_enemy(&player2);
+    player2.set_enemy(&player1);
+    player1.isTurn = true;
+    while(player1.in_game_loop() && player2.in_game_loop());
 }

@@ -4,6 +4,8 @@
 #include <conio.h>
 
 #define VK_CHAR_A 0x41
+#define TEXT_RED 12
+#define TEXT_WHITE 15
 
 using namespace std;
 
@@ -47,6 +49,25 @@ struct InputKey {
         return false;
     }
 };
+
+/**
+ * @brief set the output text color to some colors
+*/
+class TextColor {
+public:
+    HANDLE hConsole;
+    TextColor() {
+        hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    }
+
+    void set_color_white() {
+        SetConsoleTextAttribute(hConsole, 15);
+    }
+    void set_color_red() {
+        SetConsoleTextAttribute(hConsole, 12);
+    }
+};
+TextColor COLORMAKER;
 
 int get_key_value(char c) {
     return VK_CHAR_A + c - 'a';
