@@ -547,7 +547,7 @@ public:
         second /= 1000;
         decimal /= 10;
         gotoXY(xPos, yPos);
-        printf("%d:%02d.%02d    ", minute, second, decimal);
+        printf("%d:%02d.%02d ", minute, second, decimal);
     }
 
     /**

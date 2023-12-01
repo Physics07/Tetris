@@ -9,6 +9,7 @@ InputKey SPACE(VK_SPACE), UP(VK_UP), DOWN(VK_DOWN), LEFT(VK_LEFT), RIGHT(VK_RIGH
 
 int main() {
     setCursorType(NOCURSOR);
+    system("fullscreen.exe");
     system("chcp 65001");
     system("cls");
     COLORMAKER.set_color_white();

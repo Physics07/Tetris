@@ -8,7 +8,6 @@ Tetris project for Advanced Programming lecture
 * **SRS Spin (done)**
 * **7-bag rule (done)**
 * next
-* hold
 
 2. **Multiplayer (done)**
 

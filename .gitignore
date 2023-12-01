@@ -1,5 +1,5 @@
 # VSC Settings
 /.vscode
 
-#ignore exe files
-*.exe
+#ignore ps1 files
+*.ps1
