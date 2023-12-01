@@ -11,8 +11,8 @@ Tetris project for Advanced Programming lecture
 
 2. **Multiplayer (done)**
 
-3. Turn-based
-* Chess-like Time Control
+3. **Turn-based (done)**
+* **Chess-like Time Control (done)**
 
 4. Premoving
 
