@@ -1,21 +1,25 @@
-# Tetris
+# Chetris
 
 Tetris project for Advanced Programming lecture
 
-# Things to Implement
+# Keys
 
-1. Tetris
-* **SRS Spin (done)**
-* **7-bag rule (done)**
-* next
+### Player 1
+|Action|Key|
+|---|---|
+|Counterclockwise Rotation|Q|
+|Clockwise Rotation|W|
+|Hard Drop|F|
+|Left|C|
+|Right|B|
+|Soft Drop|V|
 
-2. **Multiplayer (done)**
-
-3. **Turn-based (done)**
-* **Chess-like Time Control (done)**
-
-4. Premoving
-
-# Requirements
-
-* turboc.h
+### Player 2
+|Action|Key|
+|---|---|
+|Counterclockwise Rotation|L|
+|Clockwise Rotation|; (semicolon)|
+|Hard Drop|RSHIFT|
+|Left|Left Arrow|
+|Right|Right Arrow|
+|Soft Drop|Down Arrow|

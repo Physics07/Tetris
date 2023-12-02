@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "console.hpp"
+#include "screen.hpp"
 using namespace std;
 
 const int WMAX = 10 + 2 + 2; // board width + wall + padding
@@ -101,6 +101,7 @@ const int STARTING_POS[2] = {5, 0};
 
 /// @brief tetr.io combo system
 /// row 1 - single, 2 - double, 3 - triple, 4 - quad
+/// if more: line count + combo count
 const int COMBO[][21] = {
     {0},
     {0,0,1,1,1,1,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3},
@@ -169,7 +170,7 @@ public:
             if(isFull) {
                 ret++;
                 for(int k=i; k>=1; k--) for(int j=2; j<WMAX-2; j++) {
-                    board[k][j] = board[k-1][j];
+                    if(board[k-1][j] != 5 && board[k-1][j] != 4) board[k][j] = board[k-1][j];
                 }
             }
         }
@@ -194,7 +195,7 @@ public:
         int emptySpace = randomInt(random_gen) + 2; // random place in the board
         for(int i=0; i<HMAX-1-lineCount; i++) {
             for(int j=2; j<WMAX-2; j++) {
-                if(board[i+lineCount][j] != 5)
+                if(board[i+lineCount][j] != 5 && board[i+lineCount][j] != 4)
                     board[i][j] = board[i+lineCount][j];
             }
         }
@@ -494,8 +495,9 @@ public:
      * @brief sends attack to enemy's board / clears the garbage of this board
     */
     void send_attack(int lineCount) {
-        int garbageLineSend = COMBO[lineCount][20];
-        if(comboCount < 20) garbageLineSend = COMBO[lineCount][comboCount];
+        if(!lineCount) return;
+        int garbageLineSend = (lineCount <= 4 ? COMBO[lineCount][20] : lineCount + comboCount);
+        if(lineCount <= 4 && comboCount < 20) garbageLineSend = COMBO[lineCount][comboCount];
         while(!garbageCount.empty() && garbageLineSend > 0) {
             garbageCount.front() -= garbageLineSend;
             if(garbageCount.front() <= 0) { // if the garbage is cleared
@@ -551,6 +553,40 @@ public:
     }
 
     /**
+     * @brief starts the turn of this player.
+     * @details manages all the stuff in the premoving process.
+    */
+    void start_turn() {
+        isTurn = true;
+        int currLineCount = board.clear_line();
+        prvDropTime = clock();
+        currTime = clock();
+
+        // sending lines and clearing/generating garbages
+        if(currLineCount) {
+            send_attack(currLineCount);
+        }
+        else {
+            comboCount = 0;
+        }
+
+        gravityCount = 0;
+        if(!currBlock) {
+            currBlock = blockList[0];
+            blockList.pop_front();
+            currBlock->make_in_board();
+            currBlock->generate_shadow();
+
+            // switch the turn
+            isTurn = false;
+            if(enemyGame) enemyGame->start_turn();
+            
+            // fisher
+            currLeftTime += fisherTime;
+        }
+    }
+
+    /**
      * @brief generating next block
     */
     void generate_next_block() {
@@ -576,11 +612,34 @@ public:
             
             // switch the turn
             isTurn = false;
-            if(enemyGame) enemyGame->isTurn = true;
+            if(enemyGame) enemyGame->start_turn();
             
             // fisher
             currLeftTime += fisherTime;
         }
+        currBlock = blockList[0];
+        blockList.pop_front();
+        currBlock->make_in_board();
+        currBlock->generate_shadow();
+    }
+
+    /**
+     * @brief generate the next block when the player is premoving
+     * @details premoving the blocks is up to 1 bag & premoving doesn't send or get attacks.
+    */
+    void generate_next_block_when_premoving() {
+        gravityCount = 0;
+        blockCount++;
+        if(blockCount == 7) {
+            blockCount = 0;
+            for(int i=0; i<7; i++) blockList.push_back(nxtBlockList[i]);
+            nxtBlockList.clear();
+            for(int i=0; i<7; i++) nxtBlockList.push_back(new Block(i, &board));
+            shuffle(nxtBlockList.begin(), nxtBlockList.end(), random_gen);
+            currBlock = nullptr;
+            return;
+        }
+
         currBlock = blockList[0];
         blockList.pop_front();
         currBlock->make_in_board();
@@ -594,23 +653,26 @@ public:
         board.show(isTurn);
         draw_garbage_line();
         draw_time();
-        if(!isTurn) return true;
 
-        // time control
-        currLeftTime -= clock_millisecond(clock() - currTime);
-        currTime = clock();
-        if(currLeftTime < 0) return false;
+        if(isTurn) {
+            // time control
+            currLeftTime -= clock_millisecond(clock() - currTime);
+            currTime = clock();
+            if(currLeftTime < 0) return false;
 
-        // gravity
-        if(clock_millisecond(clock() - prvDropTime) >= gravityDelay) {
-            prvDropTime = clock();
-            if(!currBlock->move_block_down()) gravityCount++;
-            if(gravityCount == gravityMaxCount) {
-                currBlock->fix();
-                generate_next_block();
-                return !board.is_dead();
+            // gravity
+            if(clock_millisecond(clock() - prvDropTime) >= gravityDelay) {
+                prvDropTime = clock();
+                if(!currBlock->move_block_down()) gravityCount++;
+                if(gravityCount == gravityMaxCount) {
+                    currBlock->fix();
+                    generate_next_block();
+                    return !board.is_dead();
+                }
             }
         }
+
+        if(!currBlock) return !board.is_dead();
 
         if(rotateCCW.is_pressed_first()) {
             currBlock->rotate_counterclockwise();
@@ -644,7 +706,8 @@ public:
 
         if(hardDrop.is_pressed_first()) {
             currBlock->hard_drop();
-            generate_next_block();
+            if(isTurn) generate_next_block();
+            else generate_next_block_when_premoving();
             return !board.is_dead();
         }
 
