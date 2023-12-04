@@ -646,6 +646,34 @@ public:
         currBlock->generate_shadow();
     }
 
+    void show_next() {
+        int x = board.X_POS + WMAX + 2, y = board.Y_POS + 4;
+        if(!isTurn) {
+            for(int i=0; i<5; i++, y+=4) for(int j=0; j<4; j++) draw_string("    ", x, y + j);
+            return;
+        }
+        for(int i=0; i<5; i++, y+=4) {
+            if(i<(int)blockList.size()) {
+                vector<vector<int>> &block = MINO[blockList[i]->blockNum][0];
+                for(int j=0; j<(int)block.size(); j++) {
+                    for(int k=0; k<4; k++) {
+                        if(k<(int)block[0].size()) draw_string(TILE[block[j][k]], x + k, y + j);
+                        else draw_string(TILE[0], x + k, y + j);
+                    }
+                }
+            }
+            else {
+                vector<vector<int>> &block = MINO[nxtBlockList[i+blockCount-6]->blockNum][0];
+                for(int j=0; j<(int)block.size(); j++) {
+                    for(int k=0; k<4; k++) {
+                        if(k<(int)block[0].size()) draw_string(TILE[block[j][k]], x + k, y + j);
+                        else draw_string(TILE[0], x + k, y + j);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * @brief loop of game
     */
@@ -653,6 +681,7 @@ public:
         board.show(isTurn);
         draw_garbage_line();
         draw_time();
+        show_next();
 
         if(isTurn) {
             // time control
